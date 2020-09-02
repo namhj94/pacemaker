@@ -1,0 +1,31 @@
+---
+- name: Deploy pacemaker
+  hosts: all
+  become: yes
+  tasks:
+    - name: Copy /etc/hosts to all nodes
+      copy:
+        src: hosts
+        dest: /etc/hosts
+    - name: Install pacemkaer
+      yum:
+        name: 
+          - pacemaker
+          - pcs
+        state: present
+    - name: Service start
+      service:
+        name: pcsd
+        state: started
+        enabled: yes
+    - name: Service Open
+      firewalld:
+        service: high-availability
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: modify hacluster user passwd
+      user:
+        name: hacluster
+        password: "{{ 'dkagh1.' | password_hash('sha512') }}"
+    
